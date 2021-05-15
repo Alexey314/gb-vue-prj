@@ -2,27 +2,90 @@
   <div id="app">
     <h1>My personal costs</h1>
     <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
+    <button class="add-btn" @click="toggleInputFormVisible">
+      ADD NEW COST +
+    </button>
+    <cost-input-form v-show="showInputForm" @add="onAddCost" />
+    <costs-list :costs-list="costsListPaginated" />
+    <paginator-widget :count="costsListPages" @change-page="onChangePage" />
   </div>
 </template>
 
 <script>
-// import HelloWorld from "./components/HelloWorld.vue";
+import CostInputForm from "./components/CostInputForm.vue";
+import CostsList from "./components/CostsList.vue";
+import PaginatorWidget from "./components/PaginatorWidget.vue";
 
 export default {
   name: "App",
   components: {
-    // HelloWorld,
+    CostInputForm,
+    CostsList,
+    PaginatorWidget,
+  },
+  data: () => ({
+    showInputForm: false,
+    costs: [],
+    maxCostsListLength: 5,
+    costsListPageNum: 1,
+  }),
+  methods: {
+    toggleInputFormVisible() {
+      this.showInputForm = !this.showInputForm;
+    },
+    onAddCost(newCost) {
+      const newCostsRec = Object.assign({}, newCost);
+      const newCostsIndex = this.costs.length;
+      newCostsRec.index = newCostsIndex + 1;
+      this.$set(this.costs, newCostsIndex, newCostsRec);
+    },
+    onChangePage(pageNum) {
+      this.costsListPageNum = pageNum;
+    },
+  },
+  computed: {
+    costsListPages() {
+      return Math.max(
+        1,
+        Math.ceil(this.costs.length / this.maxCostsListLength)
+      );
+    },
+    costsListPaginated() {
+      const startIndex = (this.costsListPageNum - 1) * this.maxCostsListLength;
+      return this.costs.slice(startIndex, startIndex + this.maxCostsListLength);
+    },
   },
 };
 </script>
 
 <style lang="scss">
+@use "sass:color";
+
+$btn-bg-color-main: #25a79a;
+$btn-bg-color-hover: lighten($btn-bg-color-main, 5%);
+$btn-bg-color-active: darken($btn-bg-color-main, 10%);
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  text-align: left;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.add-btn {
+  display: block;
+  background-color: $btn-bg-color-main;
+  border: none;
+  color: #d0ebe8;
+  padding: 8px;
+  cursor: pointer;
+  &:hover {
+    background-color: $btn-bg-color-hover;
+  }
+  &:active {
+    background-color: $btn-bg-color-active;
+  }
 }
 </style>
