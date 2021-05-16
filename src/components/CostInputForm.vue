@@ -18,7 +18,10 @@
       placeholder="Payment date"
       v-model.trim="paymentDate"
     />
-    <button :class="[$style.addBtn]" @click="onClickAdd">
+    <button
+      :class="[$style.addBtn, isInputsValid ? '' : $style.addBtnDisabled]"
+      @click="onClickAdd"
+    >
       <span :class="[$style.addBtnText]">ADD</span>+
     </button>
   </div>
@@ -27,9 +30,9 @@
 <script>
 export default {
   data: () => ({
-    paymentDescription: "Buy food",
-    paymentAmount: 123.4,
-    paymentDate: "23.04.2021",
+    paymentDescription: "",
+    paymentAmount: null,
+    paymentDate: "",
   }),
   methods: {
     onClickAdd() {
@@ -38,6 +41,16 @@ export default {
         paymentAmount: this.paymentAmount,
         paymentDate: this.paymentDate,
       });
+    },
+  },
+  computed: {
+    isInputsValid() {
+      return (
+        this.paymentDescription &&
+        !Number.isNaN(+this.paymentAmount) &&
+        typeof this.paymentAmount === "number" &&
+        this.paymentDate
+      );
     },
   },
 };
@@ -69,6 +82,9 @@ export default {
   &Text {
     padding-left: 32px;
     padding-right: 32px;
+  }
+  &Disabled {
+    background-color: $btn-bg-color-disabled;
   }
 }
 </style>
