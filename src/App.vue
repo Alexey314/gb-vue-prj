@@ -1,13 +1,16 @@
 <template>
   <div id="app">
     <h1>My personal costs</h1>
-    <!-- <HelloWorld msg="Welcome to Your Vue.js App" /> -->
     <button class="add-btn" @click="toggleInputFormVisible">
       ADD NEW COST +
     </button>
     <cost-input-form v-show="showInputForm" @add="onAddCost" />
     <costs-list :costs-list="costsListPaginated" />
-    <paginator-widget :count="costsListPages" @change-page="onChangePage" />
+    <paginator-widget
+      :page-count="costsListPages"
+      :page-num="costsListPageNum"
+      @change-page="onChangePage"
+    />
   </div>
 </template>
 
@@ -38,6 +41,7 @@ export default {
       const newCostsIndex = this.costs.length;
       newCostsRec.index = newCostsIndex + 1;
       this.$set(this.costs, newCostsIndex, newCostsRec);
+      this.costsListPageNum = this.costsListPages;
     },
     onChangePage(pageNum) {
       this.costsListPageNum = pageNum;

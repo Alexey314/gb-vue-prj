@@ -3,11 +3,11 @@
     <button @click="onPrev">&lt;</button>
     <button
       @click="onPageNumClick(pageNum)"
-      v-for="pageNum in pageNumbers"
-      :key="pageNum"
-      :class="[activePageNum == pageNum ? $style.btnActive : '']"
+      v-for="pageBtnNum in pageNumbers"
+      :key="pageBtnNum"
+      :class="[pageNum == pageBtnNum ? $style.btnActive : '']"
     >
-      {{ pageNum }}
+      {{ pageBtnNum }}
     </button>
     <button @click="onNext">&gt;</button>
   </div>
@@ -16,31 +16,29 @@
 <script>
 export default {
   props: {
-    count: Number,
+    pageCount: Number,
+    pageNum: Number,
   },
-  data: () => ({
-    activePageNum: 1,
-  }),
+  // data: () => ({
+  //   activePageNum: 1,
+  // }),
   methods: {
     onPrev() {
-      this.activePageNum = Math.max(1, this.activePageNum - 1);
-      this.emitEvent();
+      this.emitEvent(Math.max(1, this.pageNum - 1));
     },
     onNext() {
-      this.activePageNum = Math.min(this.count, this.activePageNum + 1);
-      this.emitEvent();
+      this.emitEvent(Math.min(this.pageCount, this.pageNum + 1));
     },
     onPageNumClick(pageNum) {
-      this.activePageNum = pageNum;
-      this.emitEvent();
+      this.emitEvent(pageNum);
     },
-    emitEvent() {
-      this.$emit("change-page", this.activePageNum);
+    emitEvent(pageNum) {
+      this.$emit("change-page", pageNum);
     },
   },
   computed: {
     pageNumbers() {
-      return Array(this.count)
+      return Array(this.pageCount)
         .fill(0)
         .map((val, index) => index + 1);
     },
