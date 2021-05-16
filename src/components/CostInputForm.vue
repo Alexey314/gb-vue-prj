@@ -19,8 +19,9 @@
       v-model.trim="paymentDate"
     />
     <button
-      :class="[$style.addBtn, isInputsValid ? '' : $style.addBtnDisabled]"
+      :class="[$style.addBtn]"
       @click="onClickAdd"
+      :disabled="!isInputsValid"
     >
       <span :class="[$style.addBtnText]">ADD</span>+
     </button>
@@ -83,8 +84,11 @@ export default {
     padding-left: 32px;
     padding-right: 32px;
   }
-  &Disabled {
+  &:disabled {
     background-color: $btn-bg-color-disabled;
+    &:hover {
+      background-color: $btn-bg-color-disabled;
+    }
   }
 }
 </style>
