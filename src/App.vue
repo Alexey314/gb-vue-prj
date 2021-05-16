@@ -63,11 +63,11 @@ export default {
 </script>
 
 <style lang="scss">
-@use "sass:color";
+@import "./components/scss/_variables.scss";
 
-$btn-bg-color-main: #25a79a;
-$btn-bg-color-hover: lighten($btn-bg-color-main, 5%);
-$btn-bg-color-active: darken($btn-bg-color-main, 10%);
+* {
+  box-sizing: border-box;
+}
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -82,7 +82,7 @@ $btn-bg-color-active: darken($btn-bg-color-main, 10%);
   display: block;
   background-color: $btn-bg-color-main;
   border: none;
-  color: #d0ebe8;
+  color: $btn-color-main;
   padding: 8px;
   cursor: pointer;
   &:hover {
