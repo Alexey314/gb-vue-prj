@@ -7,6 +7,7 @@
     <cost-input-form v-show="showInputForm" @add="onAddCost" />
     <costs-list :costs-list="costsListPaginated" />
     <paginator-widget
+      v-show="costs.length > maxCostsListPageLength"
       :page-count="costsListPages"
       :page-num="costsListPageNum"
       @change-page="onChangePage"
@@ -29,7 +30,7 @@ export default {
   data: () => ({
     showInputForm: false,
     costs: [],
-    maxCostsListLength: 5,
+    maxCostsListPageLength: 5,
     costsListPageNum: 1,
   }),
   methods: {
@@ -51,12 +52,12 @@ export default {
     costsListPages() {
       return Math.max(
         1,
-        Math.ceil(this.costs.length / this.maxCostsListLength)
+        Math.ceil(this.costs.length / this.maxCostsListPageLength)
       );
     },
     costsListPaginated() {
-      const startIndex = (this.costsListPageNum - 1) * this.maxCostsListLength;
-      return this.costs.slice(startIndex, startIndex + this.maxCostsListLength);
+      const startIndex = (this.costsListPageNum - 1) * this.maxCostsListPageLength;
+      return this.costs.slice(startIndex, startIndex + this.maxCostsListPageLength);
     },
   },
 };
