@@ -11,7 +11,12 @@ $input-border: 1px solid #dedede;
 $input-border-radius: 4px;
 
 $text-color-main: #202020;
+$bg-color-main: #ffffff;
 
 $table-border-color: #f1f1f1;
+
+$paginator-border-color: $table-border-color;
+$paginator-border-radius: $input-border-radius;
+$paginator-active-color:#2695ca;
 
 $el-space: 8px;
