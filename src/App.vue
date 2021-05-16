@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>My personal costs</h1>
-    <button class="add-btn" @click="toggleInputFormVisible">
+    <button class="add-btn add-btn_mb" @click="toggleInputFormVisible">
       ADD NEW COST +
     </button>
     <cost-input-form v-show="showInputForm" @add="onAddCost" />
@@ -64,6 +64,7 @@ export default {
 
 <style lang="scss">
 @import "./components/scss/_variables.scss";
+@import "./components/scss/_mixins.scss";
 
 * {
   box-sizing: border-box;
@@ -74,22 +75,14 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  color: #2c3e50;
+  color: $text-color-main;
   margin-top: 60px;
 }
 
 .add-btn {
-  display: block;
-  background-color: $btn-bg-color-main;
-  border: none;
-  color: $btn-color-main;
-  padding: 8px;
-  cursor: pointer;
-  &:hover {
-    background-color: $btn-bg-color-hover;
-  }
-  &:active {
-    background-color: $btn-bg-color-active;
+  @include btn-decoration;
+  &_mb {
+    margin-bottom: $el-space;
   }
 }
 </style>

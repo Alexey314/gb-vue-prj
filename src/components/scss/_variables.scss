@@ -2,4 +2,14 @@ $btn-bg-color-main: #25a79a;
 $btn-bg-color-hover: lighten($btn-bg-color-main, 5%);
 $btn-bg-color-active: darken($btn-bg-color-main, 10%);
 
-$btn-color-main: #d0ebe8;
+$btn-color-main: #fdfefe;
+$btn-padding: 8px;
+$btn-border-radius: 4px;
+
+$input-padding: 8px;
+$input-border: 1px solid #dedede;
+$input-border-radius: 4px;
+
+$text-color-main: #202020;
+
+$el-space: 8px;

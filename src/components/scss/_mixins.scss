@@ -1,0 +1,17 @@
+@import "./_variables.scss";
+
+@mixin btn-decoration {
+  display: block;
+  background-color: $btn-bg-color-main;
+  border: none;
+  border-radius: $btn-border-radius;
+  color: $btn-color-main;
+  padding: $btn-padding;
+  cursor: pointer;
+  &:hover {
+    background-color: $btn-bg-color-hover;
+  }
+  &:active {
+    background-color: $btn-bg-color-active;
+  }
+}

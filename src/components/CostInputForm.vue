@@ -18,7 +18,9 @@
       placeholder="Payment date"
       v-model.trim="paymentDate"
     />
-    <button :class="[$style.addBtn]" @click="onClickAdd">ADD +</button>
+    <button :class="[$style.addBtn]" @click="onClickAdd">
+      <span :class="[$style.addBtnText]">ADD</span>+
+    </button>
   </div>
 </template>
 
@@ -43,7 +45,7 @@ export default {
 
 <style module lang="scss">
 @import "./scss/_variables.scss";
-
+@import "./scss/_mixins.scss";
 
 .root {
   display: flex;
@@ -54,24 +56,19 @@ export default {
 .input {
   display: block;
   width: 100%;
-  padding: 8px;
-  margin-top: 8px;
+  padding: $input-padding;
+  margin-bottom: $el-space;
+  border: $input-border;
+  border-radius: $input-border-radius;
+  color: $text-color-main;
+  outline: none;
 }
 
 .addBtn {
-  display: block;
-  width: max-content;
-  background-color: $btn-bg-color-main;
-  border: none;
-  color: $btn-color-main;
-  padding: 8px;
-  margin-top: 8px;
-  cursor: pointer;
-  &:hover {
-    background-color: $btn-bg-color-hover;
-  }
-  &:active {
-    background-color: $btn-bg-color-active;
+  @include btn-decoration;
+  &Text {
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 </style>
