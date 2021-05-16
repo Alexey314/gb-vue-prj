@@ -8,10 +8,13 @@
   color: $btn-color-main;
   padding: $btn-padding;
   cursor: pointer;
-  &:hover {
+  &:not(:disabled):hover {
     background-color: $btn-bg-color-hover;
   }
-  &:active {
+  &:not(:disabled):active {
     background-color: $btn-bg-color-active;
+  }
+  &:disabled {
+    background-color: $btn-bg-color-disabled;
   }
 }

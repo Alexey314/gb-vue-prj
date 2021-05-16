@@ -84,11 +84,5 @@ export default {
     padding-left: 32px;
     padding-right: 32px;
   }
-  &:disabled {
-    background-color: $btn-bg-color-disabled;
-    &:hover {
-      background-color: $btn-bg-color-disabled;
-    }
-  }
 }
 </style>
