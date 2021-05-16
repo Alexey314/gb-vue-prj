@@ -18,3 +18,9 @@
     background-color: $btn-bg-color-disabled;
   }
 }
+
+@mixin container-margins($width) {
+  max-width: $width;
+  margin-left: auto;
+  margin-right: auto;
+}

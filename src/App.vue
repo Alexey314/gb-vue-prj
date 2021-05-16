@@ -1,17 +1,24 @@
 <template>
   <div id="app">
-    <h1>My personal costs</h1>
-    <button class="add-btn add-btn_mb" @click="toggleInputFormVisible">
-      ADD NEW COST +
-    </button>
-    <cost-input-form v-show="showInputForm" @add="onAddCost" />
-    <costs-list :costs-list="costsListPaginated" />
-    <paginator-widget
-      v-show="costs.length > maxCostsListPageLength"
-      :page-count="costsListPages"
-      :page-num="costsListPageNum"
-      @change-page="onChangePage"
-    />
+    <header>
+      <h1>My personal costs</h1>
+    </header>
+    <main class="main">
+      <section class="costs-operation">
+        <button class="add-btn add-btn_mb" @click="toggleInputFormVisible">
+          ADD NEW COST +
+        </button>
+        <cost-input-form v-show="showInputForm" @add="onAddCost" />
+        <costs-list :costs-list="costsListPaginated" />
+        <paginator-widget
+          v-show="costs.length > maxCostsListPageLength"
+          :page-count="costsListPages"
+          :page-num="costsListPageNum"
+          @change-page="onChangePage"
+        />
+      </section>
+      <section class="costs-visualization">TBD</section>
+    </main>
   </div>
 </template>
 
@@ -56,8 +63,12 @@ export default {
       );
     },
     costsListPaginated() {
-      const startIndex = (this.costsListPageNum - 1) * this.maxCostsListPageLength;
-      return this.costs.slice(startIndex, startIndex + this.maxCostsListPageLength);
+      const startIndex =
+        (this.costsListPageNum - 1) * this.maxCostsListPageLength;
+      return this.costs.slice(
+        startIndex,
+        startIndex + this.maxCostsListPageLength
+      );
     },
   },
 };
@@ -78,6 +89,23 @@ export default {
   text-align: left;
   color: $text-color-main;
   margin-top: 60px;
+  @include container-margins($container-width-desktop);
+}
+
+.main {
+  width: 100%;
+  display: flex;
+}
+
+.costs-operation {
+  flex-basis: 50%;
+  margin-right: $el-space;
+}
+
+.costs-visualization {
+  flex-basis: 50%;
+  margin-left: $el-space;
+  background-color: lightgray;
 }
 
 .add-btn {
