@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { mapMutations } from "vuex";
+
 export default {
   data: () => ({
     paymentDescription: "",
@@ -36,11 +38,12 @@ export default {
     paymentDate: "",
   }),
   methods: {
+    ...mapMutations(['addNewCost']),
     onClickAdd() {
-      this.$emit("add", {
-        paymentDescription: this.paymentDescription,
-        paymentAmount: this.paymentAmount,
-        paymentDate: this.paymentDate,
+      this.addNewCost( {
+        category: this.paymentDescription,
+        value: this.paymentAmount,
+        date: this.paymentDate,
       });
     },
   },

@@ -14,10 +14,10 @@
     </thead>
     <tbody>
       <tr v-for="(rec, i) in costsList" :key="i">
-        <td>{{ rec.index }}</td>
-        <td>{{ rec.paymentDate }}</td>
-        <td>{{ rec.paymentDescription }}</td>
-        <td>{{ rec.paymentAmount }}</td>
+        <td>{{ rec.id }}</td>
+        <td>{{ rec.date }}</td>
+        <td>{{ rec.category }}</td>
+        <td>{{ rec.value }}</td>
       </tr>
     </tbody>
   </table>
