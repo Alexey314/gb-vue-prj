@@ -1,4 +1,12 @@
 {
   "pageCount": 3,
-  "costsPerPage": 3
+  "costsPerPage": 3,
+  "categories": [
+    "Food",
+    "Navigation",
+    "Sport",
+    "Entertaiment",
+    "Education",
+    "Health"
+  ]
 }

@@ -1,10 +1,16 @@
 <template>
   <div :class="[$style.root]">
+    <select :class="[$style.input]" v-model="paymentDescription">
+      <option disabled value="">Please select payment description</option>
+      <option v-for="cat in costsCategories" :key="cat">{{ cat }}</option>
+      <option value="000">enter new payment description below</option>
+    </select>
     <input
+      v-if="paymentDescription === '000'"
       :class="[$style.input]"
       type="text"
       placeholder="Payment description"
-      v-model.trim="paymentDescription"
+      v-model.trim="newPaymentDescription"
     />
     <input
       :class="[$style.input]"
@@ -34,27 +40,42 @@ import { mapMutations } from "vuex";
 export default {
   data: () => ({
     paymentDescription: "",
+    newPaymentDescription: "",
     paymentAmount: null,
     paymentDate: "",
   }),
   methods: {
-    ...mapMutations(['addNewCost']),
+    ...mapMutations(["addNewCost", "addCostsCategories"]),
     onClickAdd() {
-      this.addNewCost( {
-        category: this.paymentDescription,
+      this.addNewCost({
+        category: this.actualPaymentDescription,
         value: this.paymentAmount,
         date: this.paymentDate,
       });
+      if (this.isNewPaymentDescription) {
+        this.addCostsCategories([this.newPaymentDescription]);
+      }
     },
   },
   computed: {
     isInputsValid() {
       return (
-        this.paymentDescription &&
+        this.actualPaymentDescription &&
         !Number.isNaN(+this.paymentAmount) &&
         typeof this.paymentAmount === "number" &&
         this.paymentDate
       );
+    },
+    costsCategories() {
+      return this.$store.getters.getCostsCategories;
+    },
+    actualPaymentDescription() {
+      return this.paymentDescription === "000"
+        ? this.newPaymentDescription
+        : this.paymentDescription;
+    },
+    isNewPaymentDescription() {
+      return this.paymentDescription === "000";
     },
   },
 };

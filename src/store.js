@@ -11,6 +11,7 @@ const store = new Vuex.Store({
     costsPageCount: 1,
     costsPerPage: 1,
     userAddedCostCount: 0,
+    costsCategories: new Set(),
   },
   mutations: {
     addNewCost(state, { category, value, date }) {
@@ -39,6 +40,12 @@ const store = new Vuex.Store({
       // console.log("setCostsPageData", newData);
       Vue.set(state.costs, pageKey, newData);
     },
+    addCostsCategories(state, newCategories) {
+      state.costsCategories = new Set([
+        ...state.costsCategories,
+        ...newCategories,
+      ]);
+    },
   },
   getters: {
     getCostsPageData: (state) => (pageNum) => {
@@ -53,14 +60,16 @@ const store = new Vuex.Store({
     getCostsListPageCount: (state) => state.costsPageCount,
     getCostsPerPageLimit: (state) => state.costsPerPage,
     getUserAddedCostCount: (state) => state.userAddedCostCount,
+    getCostsCategories: (state) => state.costsCategories,
   },
   actions: {
-    fetchDataStatus({ state }) {
+    fetchDataStatus({ commit, state }) {
       return fetch("./PaymentsDataStatus.json").then((response) => {
         response.json().then((val) => {
           // console.log(val);
           state.costsPageCount = Math.max(val.pageCount, state.costsPageCount);
           state.costsPerPage = val.costsPerPage;
+          commit("addCostsCategories", val.categories);
         });
       });
     },
