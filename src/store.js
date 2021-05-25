@@ -64,7 +64,7 @@ const store = new Vuex.Store({
   },
   actions: {
     fetchDataStatus({ commit, state }) {
-      return fetch("./PaymentsDataStatus.json").then((response) => {
+      return fetch("/PaymentsDataStatus.json").then((response) => {
         response.json().then((val) => {
           // console.log(val);
           state.costsPageCount = Math.max(val.pageCount, state.costsPageCount);
@@ -74,7 +74,7 @@ const store = new Vuex.Store({
       });
     },
     fetchData({ commit, state }, pageNum) {
-      return fetch("./PaymentsData.json").then((resp) => {
+      return fetch("/PaymentsData.json").then((resp) => {
         resp.json().then((val) => {
           const pageKey = getPageKey(pageNum);
           if (state.costs[pageKey] === undefined) {
