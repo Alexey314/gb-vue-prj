@@ -15,6 +15,65 @@ app.use(
   })
 );
 
+let paymentsData = [
+  { date: "20.03.2020", category: "Food", value: 169 },
+  { date: "21.03.2020", category: "Navigation", value: 50 },
+  { date: "22.03.2020", category: "Sport", value: 450 },
+  { date: "23.03.2020", category: "Entertaiment", value: 969 },
+  { date: "24.03.2020", category: "Education", value: 1500 },
+  { date: "25.03.2020", category: "Food", value: 200 },
+  { date: "27.03.2020", category: "Health", value: 844 },
+  { date: "28.03.2020", category: "Sport", value: 265 },
+  { date: "29.03.2020", category: "Food", value: 88 },
+  { date: "30.04.2020", category: "Education", value: 333 },
+];
+
+let categories = [
+  "Food",
+  "Navigation",
+  "Sport",
+  "Entertaiment",
+  "Education",
+  "Health"
+];
+
+const PAGE_CAPACITY = 3;
+
+const getPageCount = () =>
+  Math.ceil(Math.max(1, paymentsData.length / PAGE_CAPACITY));
+
+const getPaymentData = (pageNum) => {
+  const pageCount = getPageCount();
+  pageNum = Number(pageNum) | 0;
+  if (pageNum <= 0) {
+    pageNum = 1;
+  }
+  if (pageNum > pageCount) {
+    pageNum = pageCount;
+  }
+  return {
+    pageCount: getPageCount(),
+    pageNum: pageNum,
+    pageData: paymentsData
+      .slice((pageNum - 1) * PAGE_CAPACITY, pageNum * PAGE_CAPACITY)
+      .map((val, index) => {
+        val.id = 1 + index + (pageNum - 1) * PAGE_CAPACITY;
+        return val;
+      }),
+  };
+};
+
+app.get("/PaymentsData", function (req, res) {
+
+  console.log("get PaymentsData query=", req.query);
+
+  res.status(200).send(JSON.stringify(getPaymentData(req.query.page)));
+});
+
+app.get("/Categories", function (req, res) {
+  res.status(200).send(JSON.stringify(categories));
+});
+
 // добавляем общий обработчик
 app.get("*", function (req, res) {
   // на все запросы без указания конкретного файла возвращаем /index.html
@@ -63,17 +122,12 @@ app.get("*", function (req, res) {
   });
 });
 
-// // Обработка данных отправляемых клиентом
-// app.post("/cart", function (req, res) {
-//   // Добавляем товар в корзину пользователя
-//   modifyCart(getClientId(req), req.body);
-//   res.set("Content-Type", "application/json");
-//   getCartDataStream(
-//     getClientId(req),
-//     clientCartsMap,
-//     dir + "/data/products.json"
-//   ).pipe(res);
-// });
+
+app.post("/PaymentsData", function (req, res) {
+  paymentsData.push(req.body);
+  res.set("Content-Type", "application/json");
+  res.status(200).send(JSON.stringify(getPaymentData(getPageCount())));
+});
 
 // определяем на каком порту серверу ждать входящие соединения
 const port = process.env.PORT || 3000;

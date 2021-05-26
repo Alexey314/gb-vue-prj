@@ -4,7 +4,7 @@
       <button class="add-btn add-btn_mb" @click="toggleInputFormVisible">
         ADD NEW COST +
       </button>
-      <cost-input-form v-show="showInputForm" @add="onAddCost" />
+      <cost-input-form v-show="showInputForm" />
       <paginated-costs-list />
     </section>
     <section class="costs-visualization">TBD</section>
@@ -28,22 +28,17 @@ export default {
   methods: {
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
-      if (this.showInputForm) {
-        this.$store.dispatch(
-          "fetchData",
-          this.$store.getters.getCostsListPageCount
-        );
-      }
-    },
-    onAddCost(newCost) {
-      const newCostsRec = Object.assign({}, newCost);
-      const newCostsIndex = this.costs.length;
-      newCostsRec.index = newCostsIndex + 1;
-      this.$set(this.costs, newCostsIndex, newCostsRec);
-      this.costsListPageNum = this.costsListPages;
     },
   },
   computed: {},
+  mounted() {
+    if (
+      this.$route.name === "addPaymentPreset" ||
+      this.$route.name === "addPaymentManual"
+    ) {
+      this.showInputForm = true;
+    }
+  },
 };
 </script>
 
