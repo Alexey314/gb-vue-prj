@@ -20,11 +20,10 @@ export default {
   },
   methods: {
     onClick(index) {
-      this.menuSettings.items[index].onClick();
+      this.$contextMenu.command(this.menuSettings, this.menuSettings.items[index].cmd);
     },
   },
   mounted() {
-    console.log("ContextMenu mounted: ", this.$refs.wrapper);
     this.$el.style.top = this.menuSettings.position.top + "px";
     this.$el.style.left = this.menuSettings.position.left + "px";
   },

@@ -59,22 +59,6 @@ export default {
     this.$modal.show("CostInputForm");
     this.$contextMenu.EventBus.$on("show", this.onContextMenuShow);
     this.$contextMenu.EventBus.$on("hide", this.onContextMenuHide);
-    this.$contextMenu.show({
-      position: {
-        top: 100,
-        left: 100,
-      },
-      items: [
-        {
-          text: "Edit",
-          onClick: () => console.log("Edit clicked")
-        },
-        {
-          text: "Delete",
-          onClick: () => console.log("Delete clicked")
-        },
-      ],
-    });
   },
 };
 </script>

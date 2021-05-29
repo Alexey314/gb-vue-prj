@@ -7,10 +7,14 @@ export default {
     Vue.prototype.$contextMenu = {
       EventBus: new Vue(),
       show(settings) {
-        this.EventBus.$emit('show', settings)
+        this.EventBus.$emit("show", settings);
       },
       hide() {
-        this.EventBus.$emit('hide')
+        this.EventBus.$emit("hide");
+      },
+      command(settings, cmdId) {
+        settings.owner[cmdId]();
+        this.hide();
       },
     };
   },
