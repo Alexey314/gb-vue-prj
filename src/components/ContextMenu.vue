@@ -18,15 +18,33 @@ export default {
   props: {
     menuSettings: Object,
   },
+  data: function(){
+    return {
+      clickFilterListener: null
+    }
+  },
   methods: {
     onClick(index) {
-      this.$contextMenu.command(this.menuSettings, this.menuSettings.items[index].cmd);
+      this.$contextMenu.command(
+        this.menuSettings,
+        this.menuSettings.items[index].cmd
+      );
+    },
+    clickFilter(e) {
+      if (!this.$el.contains(e.target)){
+        this.$contextMenu.hide();
+      }
     },
   },
   mounted() {
     this.$el.style.top = this.menuSettings.position.top + "px";
     this.$el.style.left = this.menuSettings.position.left + "px";
+    this.clickFilterListener = this.clickFilter.bind(this);
+    window.addEventListener("click", this.clickFilterListener, true);
   },
+  beforeDestroy() {
+    window.removeEventListener("click", this.clickFilterListener, true);
+  }
 };
 </script>
 
