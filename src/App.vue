@@ -9,21 +9,28 @@
       :modalWindow="modalWindow"
       :modalWindowSettings="modalWindowSettings"
     />
+    <ContextMenu
+      v-if="contextMenuSettings"
+      :menuSettings="contextMenuSettings"
+    />
   </div>
 </template>
 
 <script>
-import ModalWindow from "./components/ModalWindow";
+// import ModalWindow from "./components/ModalWindow";
+// import ContextMenu from "./components/ContextMenu";
 
 export default {
   name: "App",
   components: {
-    ModalWindow,
+    ModalWindow: () => import("./components/ModalWindow"),
+    ContextMenu: () => import("./components/ContextMenu"),
   },
   data() {
     return {
       modalWindow: "",
       modalWindowSettings: {},
+      contextMenuSettings: null,
     };
   },
   methods: {
@@ -37,11 +44,37 @@ export default {
       this.modalWindow = "";
       this.modalWindowSettings = {};
     },
+    onContextMenuShow(settings) {
+      console.log("App.onContextMenuShow", settings);
+      this.contextMenuSettings = settings;
+    },
+    onContextMenuHide() {
+      console.log("App.onContextMenuHide");
+      this.contextMenuSettings = null;
+    },
   },
   mounted() {
     this.$modal.EventBus.$on("show", this.onModalWindowShow);
     this.$modal.EventBus.$on("hide", this.onModalWindowHide);
-    // this.$modal.show("CostInputForm");
+    this.$modal.show("CostInputForm");
+    this.$contextMenu.EventBus.$on("show", this.onContextMenuShow);
+    this.$contextMenu.EventBus.$on("hide", this.onContextMenuHide);
+    this.$contextMenu.show({
+      position: {
+        top: 100,
+        left: 100,
+      },
+      items: [
+        {
+          text: "Edit",
+          onClick: () => console.log("Edit clicked")
+        },
+        {
+          text: "Delete",
+          onClick: () => console.log("Delete clicked")
+        },
+      ],
+    });
   },
 };
 </script>
@@ -62,5 +95,6 @@ export default {
   color: $text-color-main;
   margin-top: 60px;
   @include container-margins($container-width-desktop);
+  position: relative;
 }
 </style>
