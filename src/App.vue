@@ -79,6 +79,5 @@ export default {
   color: $text-color-main;
   margin-top: 60px;
   @include container-margins($container-width-desktop);
-  position: relative;
 }
 </style>

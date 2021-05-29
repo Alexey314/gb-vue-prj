@@ -21,7 +21,8 @@
         <td>
           <span
             :class="[$style.contextMenuEllipsis]"
-            @click="onClickEllipsis(rec.id)"
+            @click="onClickEllipsis"
+            :rec-id="rec.id"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -89,10 +90,15 @@ export default {
     };
   },
   methods: {
-    onClickEllipsis(recordId) {
+    onClickEllipsis(event) {
+      const recordId = event.currentTarget.getAttribute('rec-id');
+      const rect = event.currentTarget.getBoundingClientRect();
       this.activeRecordId = recordId;
       contextMenu.owner = this;
+      contextMenu.position.top = rect.top + rect.height;
+      contextMenu.position.left = rect.left;
       this.$contextMenu.show(contextMenu);
+      console.log(recordId, rect);
     },
     [CMD_EDIT]() {
       console.log(CMD_EDIT);
