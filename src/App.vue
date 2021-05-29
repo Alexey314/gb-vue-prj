@@ -4,16 +4,44 @@
       <h1>My personal costs</h1>
     </header>
     <router-view></router-view>
+    <ModalWindow
+      v-if="modalWindow"
+      :modalWindow="modalWindow"
+      :modalWindowSettings="modalWindowSettings"
+    />
   </div>
 </template>
 
 <script>
+import ModalWindow from "./components/ModalWindow";
 
 export default {
   name: "App",
+  components: {
+    ModalWindow,
+  },
+  data() {
+    return {
+      modalWindow: "",
+      modalWindowSettings: {},
+    };
+  },
+  methods: {
+    onModalWindowShow(settings) {
+      console.log("App.onModalWindowShow", settings);
+      this.modalWindow = settings.name;
+      this.modalWindowSettings = settings;
+    },
+    onModalWindowHide() {
+      console.log("App.onModalWindowHide");
+      this.modalWindow = "";
+      this.modalWindowSettings = {};
+    },
+  },
   mounted() {
-    console.log("App mounted");
-
+    this.$modal.EventBus.$on("show", this.onModalWindowShow);
+    this.$modal.EventBus.$on("hide", this.onModalWindowHide);
+    // this.$modal.show("CostInputForm");
   },
 };
 </script>
