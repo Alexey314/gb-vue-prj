@@ -4,15 +4,19 @@
       <h1>My personal costs</h1>
     </header>
     <router-view></router-view>
-    <ModalWindow
-      v-if="modalWindow"
-      :modalWindow="modalWindow"
-      :modalWindowSettings="modalWindowSettings"
-    />
-    <ContextMenu
-      v-if="contextMenuSettings"
-      :menuSettings="contextMenuSettings"
-    />
+    <transition name="fade">
+      <ModalWindow
+        v-if="modalWindow"
+        :modalWindow="modalWindow"
+        :modalWindowSettings="modalWindowSettings"
+      />
+    </transition>
+    <transition name="fade">
+      <ContextMenu
+        v-if="contextMenuSettings"
+        :menuSettings="contextMenuSettings"
+      />
+    </transition>
   </div>
 </template>
 
@@ -79,5 +83,15 @@ export default {
   color: $text-color-main;
   margin-top: 60px;
   @include container-margins($container-width-desktop);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
