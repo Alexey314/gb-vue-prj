@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 const CMD_EDIT = "cmdEdit";
 const CMD_DELETE = "cmdDelete";
 
@@ -91,14 +92,20 @@ export default {
     };
   },
   methods: {
+    ...mapActions(["postData"]),
     onClickEllipsis(event) {
       const rect = event.currentTarget.getBoundingClientRect();
-      const recordNum = event.currentTarget.getAttribute('rec-num');
+      const recordNum = event.currentTarget.getAttribute("rec-num");
       this.activeRecordData = Object.assign({}, this.costsList[recordNum]);
       contextMenu.owner = this;
       contextMenu.position.top = rect.top + rect.height;
       contextMenu.position.left = rect.left;
       this.$contextMenu.show(contextMenu);
+      this.$contextMenu.EventBus.$on('command', this.onContextMenuCommand);
+    },
+    onContextMenuCommand(cmdId) {
+      this[cmdId]();
+      this.$contextMenu.EventBus.$off('command', this.onContextMenuCommand);
     },
     [CMD_EDIT]() {
       console.log(CMD_EDIT);
@@ -110,6 +117,10 @@ export default {
     },
     [CMD_DELETE]() {
       console.log(CMD_DELETE);
+      this.postData({
+        id: this.activeRecordData.id,
+        action: "remove",
+      });
     },
   },
   mounted() {},

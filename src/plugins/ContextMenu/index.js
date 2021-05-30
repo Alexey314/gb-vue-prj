@@ -13,7 +13,8 @@ export default {
         this.EventBus.$emit("hide");
       },
       command(settings, cmdId) {
-        settings.owner[cmdId]();
+        this.EventBus.$emit("command", cmdId);
+        // settings.owner[cmdId]();
         this.hide();
       },
     };

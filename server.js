@@ -34,7 +34,7 @@ let categories = [
   "Sport",
   "Entertaiment",
   "Education",
-  "Health"
+  "Health",
 ];
 
 const PAGE_CAPACITY = 3;
@@ -42,8 +42,9 @@ const PAGE_CAPACITY = 3;
 const getPageCount = () =>
   Math.ceil(Math.max(1, paymentsData.length / PAGE_CAPACITY));
 
-const getPageNum = (recIndex) => Math.floor(recIndex/PAGE_CAPACITY) + 1;
+const getPageNum = (recIndex) => Math.min(Math.floor(recIndex / PAGE_CAPACITY) + 1, getPageCount());
 
+const recIdToIndex = (recId) => recId - 1;
 
 const getPaymentData = (pageNum) => {
   const pageCount = getPageCount();
@@ -67,7 +68,6 @@ const getPaymentData = (pageNum) => {
 };
 
 app.get("/PaymentsData", function (req, res) {
-
   console.log("get PaymentsData query=", req.query);
 
   res.status(200).send(JSON.stringify(getPaymentData(req.query.page)));
@@ -125,16 +125,19 @@ app.get("*", function (req, res) {
   });
 });
 
-
 app.post("/PaymentsData", function (req, res) {
   const dataRec = req.body;
   let pageNumToReturn;
-  if (dataRec.id === undefined || dataRec.id === null) {
+  if (dataRec.action === "remove" && dataRec.id) {
+    const dataRecIndex = recIdToIndex(dataRec.id);
+    const newDataRecPage = getPageNum(dataRecIndex + 1);
+    paymentsData.splice(dataRecIndex,1);
+    pageNumToReturn = newDataRecPage;
+  } else if (dataRec.id === undefined || dataRec.id === null) {
     paymentsData.push(dataRec);
     pageNumToReturn = getPageCount();
-  }
-  else {
-    const dataRecIndex = dataRec.id-1;
+  } else {
+    const dataRecIndex = recIdToIndex(dataRec.id);
     paymentsData[dataRecIndex] = dataRec;
     pageNumToReturn = getPageNum(dataRecIndex);
   }
