@@ -42,6 +42,9 @@ const PAGE_CAPACITY = 3;
 const getPageCount = () =>
   Math.ceil(Math.max(1, paymentsData.length / PAGE_CAPACITY));
 
+const getPageNum = (recIndex) => Math.floor(recIndex/PAGE_CAPACITY) + 1;
+
+
 const getPaymentData = (pageNum) => {
   const pageCount = getPageCount();
   pageNum = Number(pageNum) | 0;
@@ -124,9 +127,19 @@ app.get("*", function (req, res) {
 
 
 app.post("/PaymentsData", function (req, res) {
-  paymentsData.push(req.body);
+  const dataRec = req.body;
+  let pageNumToReturn;
+  if (dataRec.id === undefined || dataRec.id === null) {
+    paymentsData.push(dataRec);
+    pageNumToReturn = getPageCount();
+  }
+  else {
+    const dataRecIndex = dataRec.id-1;
+    paymentsData[dataRecIndex] = dataRec;
+    pageNumToReturn = getPageNum(dataRecIndex);
+  }
   res.set("Content-Type", "application/json");
-  res.status(200).send(JSON.stringify(getPaymentData(getPageCount())));
+  res.status(200).send(JSON.stringify(getPaymentData(pageNumToReturn)));
 });
 
 // определяем на каком порту серверу ждать входящие соединения

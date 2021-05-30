@@ -64,13 +64,14 @@ export default {
     inputPaymentDescription: "",
     paymentAmount: null,
     paymentDate: "",
-    id: Number,
+    id: null,
   }),
   methods: {
     ...mapMutations(["addCostsCategories"]),
     ...mapActions(["fetchCategories", "postData"]),
     onClickAdd() {
       this.postData({
+        id: this.id,
         category: this.actualPaymentDescription,
         value: this.paymentAmount,
         date: this.paymentDate,
@@ -79,7 +80,10 @@ export default {
         this.addCostsCategories([this.inputPaymentDescription]);
       }
     },
-    onClickSave() {},
+    onClickSave() {
+      this.onClickAdd();
+      this.$modal.hide();
+    },
     onClickClose() {
       this.$modal.hide();
     },
