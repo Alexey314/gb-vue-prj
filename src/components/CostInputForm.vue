@@ -24,13 +24,31 @@
       placeholder="Payment date"
       v-model.trim="paymentDate"
     />
-    <button
-      :class="[$style.addBtn]"
-      @click="onClickAdd"
-      :disabled="!isInputsValid"
-    >
-      <span :class="[$style.addBtnText]">ADD</span>+
-    </button>
+    <div :class="[$style.cmdBtnWrapper]">
+      <button
+        v-if="needShowBtnAdd"
+        :class="[$style.cmdBtn]"
+        @click="onClickAdd"
+        :disabled="!isInputsValid"
+      >
+        <span :class="[$style.addBtnText]">ADD</span>+
+      </button>
+      <button
+        v-if="needShowBtnSave"
+        :class="[$style.cmdBtn]"
+        @click="onClickSave"
+        :disabled="!isInputsValid"
+      >
+        <span :class="[$style.addBtnText]">SAVE</span>
+      </button>
+      <button
+        v-if="needShowBtnClose"
+        :class="[$style.cmdBtn]"
+        @click="onClickClose"
+      >
+        <span :class="[$style.addBtnText]">CLOSE</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -38,11 +56,15 @@
 import { mapMutations, mapActions } from "vuex";
 
 export default {
+  props: {
+    settings: Object,
+  },
   data: () => ({
     selectPaymentDescription: "",
     inputPaymentDescription: "",
     paymentAmount: null,
     paymentDate: "",
+    id: Number,
   }),
   methods: {
     ...mapMutations(["addCostsCategories"]),
@@ -57,8 +79,21 @@ export default {
         this.addCostsCategories([this.inputPaymentDescription]);
       }
     },
+    onClickSave() {},
+    onClickClose() {
+      this.$modal.hide();
+    },
   },
   computed: {
+    needShowBtnAdd() {
+      return this.settings.formButtons.includes("add");
+    },
+    needShowBtnSave() {
+      return this.settings.formButtons.includes("save");
+    },
+    needShowBtnClose() {
+      return this.settings.formButtons.includes("close");
+    },
     isInputsValid() {
       return (
         this.actualPaymentDescription &&
@@ -80,6 +115,13 @@ export default {
     },
   },
   mounted() {
+    if (this.settings.formData) {
+      this.selectPaymentDescription = this.settings.formData.category;
+      this.inputPaymentDescription = this.settings.formData.category;
+      this.paymentAmount = this.settings.formData.value;
+      this.paymentDate = this.settings.formData.date;
+      this.id = this.settings.formData.id;
+    }
     this.fetchCategories();
     if (this.$route.name === "addPaymentPreset") {
       this.selectPaymentDescription = "000";
@@ -120,11 +162,17 @@ export default {
   outline: none;
 }
 
-.addBtn {
+.cmdBtn {
+  margin-left: 8px;
   @include btn-decoration;
   &Text {
     padding-left: 32px;
     padding-right: 32px;
   }
+}
+
+.cmdBtnWrapper {
+  display: flex;
+  flex-direction: row;
 }
 </style>

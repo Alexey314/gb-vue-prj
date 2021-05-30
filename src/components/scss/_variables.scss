@@ -15,7 +15,9 @@ $text-color-main: #202020;
 $bg-color-main: #ffffff;
 
 $bg-color-menu: $bg-color-main;
-$bg-color-menu-hover: darken($bg-color-main, 10%);;
+$bg-color-menu-hover: darken($bg-color-main, 10%);
+
+$bg-color-modal: $bg-color-main;
 
 $table-border-color: #f1f1f1;
 

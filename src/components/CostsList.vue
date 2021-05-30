@@ -23,6 +23,7 @@
             :class="[$style.contextMenuEllipsis]"
             @click="onClickEllipsis"
             :rec-id="rec.id"
+            :rec-num="i"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -86,22 +87,26 @@ export default {
   },
   data: function () {
     return {
-      activeRecordId: null,
+      activeRecordData: null,
     };
   },
   methods: {
     onClickEllipsis(event) {
-      const recordId = event.currentTarget.getAttribute('rec-id');
       const rect = event.currentTarget.getBoundingClientRect();
-      this.activeRecordId = recordId;
+      const recordNum = event.currentTarget.getAttribute('rec-num');
+      this.activeRecordData = Object.assign({}, this.costsList[recordNum]);
       contextMenu.owner = this;
       contextMenu.position.top = rect.top + rect.height;
       contextMenu.position.left = rect.left;
       this.$contextMenu.show(contextMenu);
-      console.log(recordId, rect);
     },
     [CMD_EDIT]() {
       console.log(CMD_EDIT);
+      this.$modal.show("CostInputForm", {
+        header: "Edit payment details",
+        formButtons: ["save", "close"],
+        formData: this.activeRecordData,
+      });
     },
     [CMD_DELETE]() {
       console.log(CMD_DELETE);

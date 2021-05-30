@@ -11,6 +11,7 @@
         :modalWindowSettings="modalWindowSettings"
       />
     </transition>
+    <div v-show="modalWindow" id="page-mask">sfvc</div>
     <transition name="fade">
       <ContextMenu
         v-if="contextMenuSettings"
@@ -60,7 +61,6 @@ export default {
   mounted() {
     this.$modal.EventBus.$on("show", this.onModalWindowShow);
     this.$modal.EventBus.$on("hide", this.onModalWindowHide);
-    this.$modal.show("CostInputForm");
     this.$contextMenu.EventBus.$on("show", this.onContextMenuShow);
     this.$contextMenu.EventBus.$on("hide", this.onContextMenuHide);
   },
@@ -93,5 +93,15 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+#page-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
 }
 </style>
