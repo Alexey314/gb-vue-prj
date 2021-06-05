@@ -15,6 +15,9 @@ describe("CostInputForm", () => {
   let getters;
   let store;
   let router;
+  const catSelectPlaceholder = "Please select payment description";
+  const catSelectManualOption = "enter new payment description below";
+  const catSelectOptions = ["Food", "Sport", "Education"];
 
   beforeEach(() => {
     actions = {
@@ -22,11 +25,31 @@ describe("CostInputForm", () => {
       postData: jest.fn(),
     };
     getters = {
-      getCostsCategories: jest.fn(),
+      getCostsCategories() {
+        return catSelectOptions;
+      },
     };
     store = new Vuex.Store({ actions, getters });
     router = new VueRouter();
   });
+
+  test("CostInputForm fetch categories", () => {
+    const wrapper = mount(CostInputForm, {
+      store,
+      localVue,
+      router,
+      propsData: {
+        settings: {
+          formData: {
+          },
+          formButtons: ["add"],
+        },
+      },
+    });
+    expect(actions.fetchCategories).toHaveBeenCalled();
+
+  });
+
   test("Content of CostInputForm", () => {
     const wrapper = mount(CostInputForm, {
       store,
@@ -34,11 +57,26 @@ describe("CostInputForm", () => {
       router,
       propsData: {
         settings: {
-          formData: {},
+          formData: {
+            id: 1,
+            date: "11.11.2011",
+            category: "Food",
+            value: 365.99,
+          },
           formButtons: ["add"],
         },
       },
     });
-    expect(wrapper.text()).toEqual("The message is: Hello from test!");
+    const optionEls = wrapper.find("select").findAll("option");
+    // Две опции селекта категорий захардкожены и три передает тест
+    expect(optionEls.length).toEqual(5);
+    // Проверка всех опций селекта категорий
+    [catSelectPlaceholder, ...catSelectOptions, catSelectManualOption].forEach(
+      (val, index) => {
+        expect(optionEls.at(index).text()).toEqual(val);
+      }
+    );
+    // Проверка выбранной опции селекта категорий
+    expect(wrapper.find("option:checked").text()).toEqual(catSelectPlaceholder);
   });
 });
