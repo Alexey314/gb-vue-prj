@@ -7,18 +7,21 @@
     </select>
     <input
       v-if="selectPaymentDescription === '000'"
+      name="categoryInput"
       :class="[$style.input]"
       type="text"
       placeholder="Payment description"
       v-model.trim="inputPaymentDescription"
     />
     <input
+      name="valueInput"
       :class="[$style.input]"
       type="text"
       placeholder="Payment amount"
       v-model.number="paymentAmount"
     />
     <input
+      name="dateInput"
       :class="[$style.input]"
       type="text"
       placeholder="Payment date"
@@ -27,6 +30,7 @@
     <div :class="[$style.cmdBtnWrapper]">
       <button
         v-if="needShowBtnAdd"
+        name="addBtn"
         :class="[$style.cmdBtn]"
         @click="onClickAdd"
         :disabled="!isInputsValid"
@@ -35,6 +39,7 @@
       </button>
       <button
         v-if="needShowBtnSave"
+        name="saveBtn"
         :class="[$style.cmdBtn]"
         @click="onClickSave"
         :disabled="!isInputsValid"
@@ -43,6 +48,7 @@
       </button>
       <button
         v-if="needShowBtnClose"
+        name="closeBtn"
         :class="[$style.cmdBtn]"
         @click="onClickClose"
       >
