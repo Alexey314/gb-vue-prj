@@ -5,5 +5,5 @@ module.exports = {
     "\\.js$": "babel-jest",
   },
   collectCoverage: true,
-  collectCoverageFrom: ["**/*.{js,vue}", "!**/node_modules/**", "!**/dist/**"],
+  collectCoverageFrom: ["src/components/**/*.{js,vue}"],
 };
