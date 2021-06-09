@@ -8,7 +8,6 @@ const store = new Vuex.Store({
     costs: [],
     costsPageCount: 1,
     costsCategories: new Set(),
-    costsCurrentPageNum: 1,
   },
   mutations: {
     setCostsPageData(state, newData) {
@@ -22,9 +21,6 @@ const store = new Vuex.Store({
         ...newCategories,
       ]);
     },
-    setCostsPageNum(state, pageNum) {
-      state.costsCurrentPageNum = pageNum;
-    },
   },
   getters: {
     getCostsPageData: (state) => (pageNum) => {
@@ -37,8 +33,7 @@ const store = new Vuex.Store({
       return pageData === undefined ? [] : pageData;
     },
     getCostsListPageCount: (state) => state.costsPageCount,
-    getCostsCategories: (state) => state.costsCategories,
-    getCostsCurrentPageNum: (state) => state.costsCurrentPageNum,
+    getCostsCategories: (state) => [...state.costsCategories],
   },
   actions: {
     postData({ commit }, newData) {

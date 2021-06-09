@@ -1,14 +1,19 @@
 <template>
-  <main class="main">
-    <section class="costs-operation">
-      <button class="add-btn add-btn_mb" @click="toggleInputFormVisible">
-        ADD NEW COST +
-      </button>
-      <cost-input-form v-show="showInputForm" :settings="{formButtons: ['add']}"/>
+  <v-container>
+    <v-row>
+    <v-col>
+      <v-btn color="teal" dark @click="toggleInputFormVisible">
+        ADD NEW COST <v-icon>mdi-plus</v-icon>
+      </v-btn>
+      <cost-input-form
+        v-show="showInputForm"
+        :settings="{ formButtons: ['add'] }"
+      />
       <paginated-costs-list />
-    </section>
-    <section class="costs-visualization">TBD</section>
-  </main>
+    </v-col>
+    <v-col class="costs-visualization">TBD</v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

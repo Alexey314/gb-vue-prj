@@ -7,10 +7,10 @@ export default {
     Vue.prototype.$modal = {
       EventBus: new Vue(),
       show(name, settings) {
-        this.EventBus.$emit('show', { name, ...settings})
+        this.EventBus.$emit("show", { name, ...settings });
       },
       hide() {
-        this.EventBus.$emit('hide')
+        this.EventBus.$emit("hide");
       },
     };
   },
