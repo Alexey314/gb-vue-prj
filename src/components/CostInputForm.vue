@@ -6,7 +6,6 @@
           <v-select
             v-model="selectPaymentDescription"
             :items="costsCategories"
-            :rules="[(v) => !!v || 'Item is required']"
             label="Please select payment description"
             required
           ></v-select>
@@ -14,21 +13,18 @@
           <v-text-field
             v-if="selectPaymentDescription === enterNewCategoryText"
             v-model="inputPaymentDescription"
-            :rules="emailRules"
             label="Payment description"
             required
           ></v-text-field>
 
           <v-text-field
             v-model="paymentAmount"
-            :rules="nameRules"
             label="Payment amount"
             required
           ></v-text-field>
 
           <v-text-field
             v-model="paymentDate"
-            :rules="emailRules"
             label="Payment date"
             required
           ></v-text-field>

@@ -34,6 +34,16 @@ const store = new Vuex.Store({
     },
     getCostsListPageCount: (state) => state.costsPageCount,
     getCostsCategories: (state) => [...state.costsCategories],
+    getCostsByCategories: (state) => {
+      const map = new Map();
+      state.costs.forEach((page) => {
+        page.forEach((cost) => {
+          const value = map.get(cost.category);
+          map.set(cost.category, cost.value + (value ? +value : 0));
+        });
+      });
+      return map;
+    },
   },
   actions: {
     postData({ commit }, newData) {
