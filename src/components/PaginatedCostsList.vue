@@ -1,52 +1,43 @@
 <template>
   <div :class="[$style.root]">
-    <costs-list :costs-list="costsListPaginated" />
+    <costs-list :costs-list="pageData" />
     <div class="text-center pt-2">
-      <v-pagination v-model="currentPage" :length="costsListPageCount"></v-pagination>
+      <v-pagination
+        :value="currentPage"
+        :length="pageCount"
+        @input="$emit('changePage', $event)"
+      ></v-pagination>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+// import { FETCH_PAYMENTS_DATA } from "../action-types";
+import { mapGetters } from "vuex";
 import CostsList from "./CostsList.vue";
 
 export default {
   components: {
     CostsList,
   },
+  props: {
+    pageCount: Number,
+    pageData: Array,
+    currentPage: Number,
+  },
   data: () => ({
-    currentPage: 1,
+    paginationPage: 1,
   }),
   methods: {
-    ...mapActions(["fetchData"]),
-    ...mapGetters([
-      "getCostsPageData",
-      "getCostsListPageCount",
-    ]),
+    ...mapGetters(["getCostsPageData"]),
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
     },
-    onChangePage(pageNum) {
-      this.fetchData(pageNum);
-    },
-  },
-  computed: {
-    costsListPageCount() {
-      return this.getCostsListPageCount();
-    },
-    costsListPaginated() {
-      return this.getCostsPageData()(this.currentPage);
-    },
   },
   mounted: function () {
-    this.fetchData(1);
+
   },
-  watch: {
-    currentPage(val) {
-      this.onChangePage(val);
-    },
-  },
+  watch: {},
 };
 </script>
 

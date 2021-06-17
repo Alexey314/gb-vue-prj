@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const { Readable } = require("stream");
+const hash = require("object-hash");
 
 // получаем полный путь к папке dist
 const dir = path.join(__dirname, "dist");
@@ -26,6 +27,7 @@ let paymentsData = [
   { date: "28.03.2020", category: "Sport", value: 265 },
   { date: "29.03.2020", category: "Food", value: 88 },
   { date: "30.04.2020", category: "Education", value: 333 },
+  { date: "12.05.2020", category: "Sport", value: 777 },
 ];
 
 let categories = [
@@ -37,18 +39,26 @@ let categories = [
   "Health",
 ];
 
-const PAGE_CAPACITY = 3;
+const getPaymentsCount = () => paymentsData.length;
 
-const getPageCount = () =>
-  Math.ceil(Math.max(1, paymentsData.length / PAGE_CAPACITY));
+const getPageCount = (recordsCount, pageCapacity) =>
+  Math.ceil(recordsCount / pageCapacity);
 
-const getPageNum = (recIndex) =>
-  Math.min(Math.floor(recIndex / PAGE_CAPACITY) + 1, getPageCount());
+const getPageNum = (recIndex, pageCapacity) =>
+  Math.min(Math.floor(recIndex / Number(pageCapacity)) + 1, getPageCount(getPaymentsCount(),pageCapacity));
 
 const recIdToIndex = (recId) => recId - 1;
 
-const getPaymentData = (pageNum) => {
-  const pageCount = getPageCount();
+const getPaymentsForPage = (pageIndex, pageCapacity) => {
+  return paymentsData.slice(
+    (pageIndex - 1) * pageCapacity,
+    pageIndex * pageCapacity
+  );
+};
+
+const getPaymentData = (pageNum, pageCapacity) => {
+  pageCapacity = Number(pageCapacity) | 1;
+  const pageCount = getPageCount(getPaymentsCount(), pageCapacity);
   pageNum = Number(pageNum) | 0;
   if (pageNum <= 0) {
     pageNum = 1;
@@ -56,22 +66,55 @@ const getPaymentData = (pageNum) => {
   if (pageNum > pageCount) {
     pageNum = pageCount;
   }
+
+  const pageData = getPaymentsForPage(pageNum, pageCapacity);
+
   return {
-    pageCount: getPageCount(),
     pageNum: pageNum,
-    pageData: paymentsData
-      .slice((pageNum - 1) * PAGE_CAPACITY, pageNum * PAGE_CAPACITY)
-      .map((val, index) => {
-        val.id = 1 + index + (pageNum - 1) * PAGE_CAPACITY;
-        return val;
-      }),
+    pageHash: hash(pageData),
+    pageData: pageData.map((val, index) => {
+      val.id = 1 + index + (pageNum - 1) * pageCapacity;
+      return val;
+    }),
+  };
+};
+
+const getPaymentsHashForPage = (pageIndex, pageCapacity) => {
+  const payments = getPaymentsForPage(pageIndex, pageCapacity);
+  return hash(payments);
+};
+
+const getPaymentDataHashes = (pageCapacity) => {
+  const _pageCapacity = Number(pageCapacity);
+  const pageCount = getPageCount(getPaymentsCount(), _pageCapacity);
+  const pageHashes = [];
+
+  for (let p = 1; p <= pageCount; p++) {
+    pageHashes.push(getPaymentsHashForPage(p, _pageCapacity));
+  }
+
+  return {
+    pageCapacity: _pageCapacity,
+    pageHashes,
   };
 };
 
 app.get("/PaymentsData", function (req, res) {
   console.log("get PaymentsData query=", req.query);
 
-  res.status(200).send(JSON.stringify(getPaymentData(req.query.page)));
+  res
+    .status(200)
+    .send(
+      JSON.stringify(getPaymentData(req.query.page, req.query.pageCapacity))
+    );
+});
+
+app.get("/PaymentsDataHashes", function (req, res) {
+  console.log("get PaymentsDataHashes");
+
+  res
+    .status(200)
+    .send(JSON.stringify(getPaymentDataHashes(req.query.pageCapacity)));
 });
 
 app.get("/Categories", function (req, res) {
@@ -128,19 +171,20 @@ app.get("*", function (req, res) {
 
 app.post("/PaymentsData", function (req, res) {
   const dataRec = req.body;
+  const pageCapacity = Number(req.query.pageCapacity);
   let pageNumToReturn;
   if (dataRec.action === "remove" && dataRec.id) {
     const dataRecIndex = recIdToIndex(dataRec.id);
-    const newDataRecPage = getPageNum(dataRecIndex + 1);
+    const newDataRecPage = getPageNum(dataRecIndex + 1, pageCapacity);
     paymentsData.splice(dataRecIndex, 1);
     pageNumToReturn = newDataRecPage;
   } else if (dataRec.id === undefined || dataRec.id === null) {
     paymentsData.push(dataRec);
-    pageNumToReturn = getPageCount();
+    pageNumToReturn = getPageCount(getPaymentsCount(), pageCapacity);
   } else {
     const dataRecIndex = recIdToIndex(dataRec.id);
     paymentsData[dataRecIndex] = dataRec;
-    pageNumToReturn = getPageNum(dataRecIndex);
+    pageNumToReturn = getPageNum(dataRecIndex, pageCapacity);
   }
   res.set("Content-Type", "application/json");
   res.status(200).send(JSON.stringify(getPaymentData(pageNumToReturn)));

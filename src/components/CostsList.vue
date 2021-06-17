@@ -120,6 +120,8 @@ export default {
       this.postData({
         id: this.activeRecordData.id,
         action: "remove",
+      }).then((newPage)=>{
+        this.$router.push(`/dashboard/${newPage}`);
       });
     },
   },
