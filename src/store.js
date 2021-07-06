@@ -1,5 +1,12 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { SET_PAYMENTS_DATA_HASHES } from "./mutation-types";
+import {
+  GET_PAYMENTS_PER_PAGE,
+  GET_PAYMENTS_PAGE_COUNT,
+  GET_PAYMENTS_PAGE_DATA,
+} from "./getter-types";
+import { FETCH_PAYMENTS_DATA, FETCH_PAYMENTS_HASHES } from "./action-types";
 
 Vue.use(Vuex);
 
@@ -8,11 +15,17 @@ const store = new Vuex.Store({
     costs: [],
     costsPageCount: 1,
     costsCategories: new Set(),
+    dashboardPage: 1,
+    paymentsPerPage: 5,
+    paymentsDataHashes: {
+      pageCapacity: null,
+      pageHashes: [],
+    },
   },
   mutations: {
     setCostsPageData(state, newData) {
       // console.log("setCostsPageData", newData);
-      Vue.set(state.costs, newData.pageNum, newData.pageData);
+      Vue.set(state.costs, newData.pageNum, { hash: newData.pageHash, data: newData.pageData});
       state.costsPageCount = newData.pageCount;
     },
     addCostsCategories(state, newCategories) {
@@ -21,9 +34,18 @@ const store = new Vuex.Store({
         ...newCategories,
       ]);
     },
+    [SET_PAYMENTS_DATA_HASHES](state, value) {
+      state.paymentsDataHashes.pageCapacity = Number(value.pageCapacity);
+      if (Array.isArray(value.pageHashes)) {
+        state.paymentsDataHashes.pageHashes = value.pageHashes;
+      }
+    },
   },
   getters: {
-    getCostsPageData: (state) => (pageNum) => {
+    [GET_PAYMENTS_PER_PAGE]: (state) => state.paymentsPerPage,
+    [GET_PAYMENTS_PAGE_COUNT]: (state) =>
+      state.paymentsDataHashes.pageHashes.length,
+    [GET_PAYMENTS_PAGE_DATA]: (state) => (pageNum) => {
       const pageData = state.costs[pageNum];
       // console.log(
       //   "getCostsPageData",
@@ -37,7 +59,7 @@ const store = new Vuex.Store({
     getCostsByCategories: (state) => {
       const map = new Map();
       state.costs.forEach((page) => {
-        page.forEach((cost) => {
+        page.data.forEach((cost) => {
           const value = map.get(cost.category);
           map.set(cost.category, cost.value + (value ? +value : 0));
         });
@@ -46,8 +68,8 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    postData({ commit }, newData) {
-      return fetch("/PaymentsData", {
+    postData({ commit, state  }, newData) {
+      return fetch(`/PaymentsData?pageCapacity=${state.paymentsPerPage}`, {
         method: "POST", // *GET, POST, PUT, DELETE, etc.
         mode: "cors", // no-cors, *cors, same-origin
         cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -65,16 +87,25 @@ const store = new Vuex.Store({
         })
         .then((val) => {
           commit("setCostsPageData", val);
-          commit("setCostsPageNum", val.pageNum);
+          return val.pageNum;
         });
     },
-    fetchData({ commit }, pageNum) {
-      return fetch(`/PaymentsData?page=${pageNum}`)
+    [FETCH_PAYMENTS_DATA]({ commit, state }, pageNum) {
+      return fetch(`/PaymentsData?page=${pageNum}&pageCapacity=${state.paymentsPerPage}`)
         .then((resp) => {
           return resp.json();
         })
         .then((val) => {
           commit("setCostsPageData", val);
+        });
+    },
+    [FETCH_PAYMENTS_HASHES]({ commit, state }) {
+      return fetch(`/PaymentsDataHashes?pageCapacity=${state.paymentsPerPage}`)
+        .then((resp) => {
+          return resp.json();
+        })
+        .then((val) => {
+          commit(SET_PAYMENTS_DATA_HASHES, val);
         });
     },
     fetchCategories({ commit }) {

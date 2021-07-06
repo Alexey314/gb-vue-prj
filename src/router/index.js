@@ -10,16 +10,11 @@ const router = new Router({
   routes: [
     {
       path: "/",
-      redirect: "/dashboard",
-    },
-    {
-      path: "/dashboard",
-      //   name: "Dashboard",
-      component: PageDashboard,
+      redirect: "/dashboard/1",
     },
     {
       path: "/dashboard/:page",
-      //   name: "Dashboard",
+      name: "Dashboard",
       component: PageDashboard,
     },
     {

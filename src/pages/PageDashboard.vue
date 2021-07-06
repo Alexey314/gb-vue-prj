@@ -9,11 +9,18 @@
           v-show="showInputForm"
           :settings="{ formButtons: ['add'] }"
         />
-        <paginated-costs-list />
+        <paginated-costs-list
+          :pageCount="serverPaymentsPageCount"
+          :currentPage="currentPage"
+          @changePage="onListPageChange"
+          :pageData="pageData"
+        />
       </v-col>
       <v-col>
-        <v-card flat >
-          <v-card-title class="justify-center"> Costs by categories </v-card-title>
+        <v-card flat>
+          <v-card-title class="justify-center">
+            Costs by categories
+          </v-card-title>
           <CostsChart
             :chartData="chartData"
             :options="{
@@ -38,6 +45,12 @@ import CostInputForm from "../components/CostInputForm.vue";
 import PaginatedCostsList from "../components/PaginatedCostsList.vue";
 import CostsChart from "../components/CostsChart.vue";
 import { mapGetters } from "vuex";
+import { FETCH_PAYMENTS_DATA } from "../action-types";
+import {
+  GET_PAYMENTS_PER_PAGE,
+  GET_PAYMENTS_PAGE_COUNT,
+  GET_PAYMENTS_PAGE_DATA
+} from "../getter-types";
 
 const getRandomColor = () => {
   var letters = "0123456789ABCDEF";
@@ -65,12 +78,24 @@ export default {
   data: () => ({
     showInputForm: false,
     maxCostsListPageLength: 5,
-    costsListPageNum: 1,
+    currentPage: 1,
   }),
   methods: {
     ...mapGetters["getCostsByCategories"],
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
+    },
+    updateCurrentPageIndex() {
+      if (this.$route.name === "Dashboard") {
+        const urlPage = Number(this.$route.params.page);
+        if (Number.isInteger(urlPage) && urlPage > 0) {
+          this.currentPage = urlPage;
+        }
+      }
+    },
+    onListPageChange(newPage) {
+      this.$router.push(`/dashboard/${newPage}`);
+      this.$store.dispatch(FETCH_PAYMENTS_DATA, newPage);
     },
   },
   computed: {
@@ -89,14 +114,36 @@ export default {
       };
       return result;
     },
+    routerCurrentPage() {
+      return this.$route.params.page;
+    },
+    serverPaymentsPerPage() {
+      return this.$store.getters[GET_PAYMENTS_PER_PAGE];
+    },
+    serverPaymentsPageCount() {
+      return this.$store.getters[GET_PAYMENTS_PAGE_COUNT];
+    },
+    pageData() {
+      return this.$store.getters[GET_PAYMENTS_PAGE_DATA](this.currentPage).data;
+    },
   },
   mounted() {
+    this.$store.dispatch("FETCH_PAYMENTS_HASHES").then(() => {
+      this.updateCurrentPageIndex();
+      this.$store.dispatch(FETCH_PAYMENTS_DATA, this.currentPage);
+    });
+
     if (
       this.$route.name === "addPaymentPreset" ||
       this.$route.name === "addPaymentManual"
     ) {
       this.showInputForm = true;
     }
+  },
+  watch: {
+    routerCurrentPage() {
+      this.updateCurrentPageIndex();
+    },
   },
 };
 </script>
