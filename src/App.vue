@@ -9,13 +9,7 @@
           ADD NEW COST +
         </button>
         <cost-input-form v-show="showInputForm" @add="onAddCost" />
-        <costs-list :costs-list="costsListPaginated" />
-        <paginator-widget
-          v-show="costs.length > maxCostsListPageLength"
-          :page-count="costsListPages"
-          :page-num="costsListPageNum"
-          @change-page="onChangePage"
-        />
+        <paginated-costs-list />
       </section>
       <section class="costs-visualization">TBD</section>
     </main>
@@ -24,25 +18,25 @@
 
 <script>
 import CostInputForm from "./components/CostInputForm.vue";
-import CostsList from "./components/CostsList.vue";
-import PaginatorWidget from "./components/PaginatorWidget.vue";
+import PaginatedCostsList from "./components/PaginatedCostsList.vue";
 
 export default {
   name: "App",
   components: {
     CostInputForm,
-    CostsList,
-    PaginatorWidget,
+    PaginatedCostsList,
   },
   data: () => ({
     showInputForm: false,
-    costs: [],
     maxCostsListPageLength: 5,
     costsListPageNum: 1,
   }),
   methods: {
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
+      if (this.showInputForm) {
+        this.$store.dispatch('fetchData',this.$store.getters.getCostsListPageCount);
+      }
     },
     onAddCost(newCost) {
       const newCostsRec = Object.assign({}, newCost);
@@ -51,26 +45,8 @@ export default {
       this.$set(this.costs, newCostsIndex, newCostsRec);
       this.costsListPageNum = this.costsListPages;
     },
-    onChangePage(pageNum) {
-      this.costsListPageNum = pageNum;
-    },
   },
-  computed: {
-    costsListPages() {
-      return Math.max(
-        1,
-        Math.ceil(this.costs.length / this.maxCostsListPageLength)
-      );
-    },
-    costsListPaginated() {
-      const startIndex =
-        (this.costsListPageNum - 1) * this.maxCostsListPageLength;
-      return this.costs.slice(
-        startIndex,
-        startIndex + this.maxCostsListPageLength
-      );
-    },
-  },
+  computed: {},
 };
 </script>
 
