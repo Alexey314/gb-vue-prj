@@ -42,7 +42,8 @@ const PAGE_CAPACITY = 3;
 const getPageCount = () =>
   Math.ceil(Math.max(1, paymentsData.length / PAGE_CAPACITY));
 
-const getPageNum = (recIndex) => Math.min(Math.floor(recIndex / PAGE_CAPACITY) + 1, getPageCount());
+const getPageNum = (recIndex) =>
+  Math.min(Math.floor(recIndex / PAGE_CAPACITY) + 1, getPageCount());
 
 const recIdToIndex = (recId) => recId - 1;
 
@@ -131,7 +132,7 @@ app.post("/PaymentsData", function (req, res) {
   if (dataRec.action === "remove" && dataRec.id) {
     const dataRecIndex = recIdToIndex(dataRec.id);
     const newDataRecPage = getPageNum(dataRecIndex + 1);
-    paymentsData.splice(dataRecIndex,1);
+    paymentsData.splice(dataRecIndex, 1);
     pageNumToReturn = newDataRecPage;
   } else if (dataRec.id === undefined || dataRec.id === null) {
     paymentsData.push(dataRec);

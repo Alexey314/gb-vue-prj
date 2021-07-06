@@ -1,61 +1,72 @@
 <template>
-  <div :class="[$style.root]">
-    <select :class="[$style.input]" v-model="selectPaymentDescription">
-      <option disabled value="">Please select payment description</option>
-      <option v-for="cat in costsCategories" :key="cat">{{ cat }}</option>
-      <option value="000">enter new payment description below</option>
-    </select>
-    <input
-      v-if="selectPaymentDescription === '000'"
-      name="categoryInput"
-      :class="[$style.input]"
-      type="text"
-      placeholder="Payment description"
-      v-model.trim="inputPaymentDescription"
-    />
-    <input
-      name="valueInput"
-      :class="[$style.input]"
-      type="text"
-      placeholder="Payment amount"
-      v-model.number="paymentAmount"
-    />
-    <input
-      name="dateInput"
-      :class="[$style.input]"
-      type="text"
-      placeholder="Payment date"
-      v-model.trim="paymentDate"
-    />
-    <div :class="[$style.cmdBtnWrapper]">
-      <button
-        v-if="needShowBtnAdd"
-        name="addBtn"
-        :class="[$style.cmdBtn]"
-        @click="onClickAdd"
-        :disabled="!isInputsValid"
-      >
-        <span :class="[$style.addBtnText]">ADD</span>+
-      </button>
-      <button
-        v-if="needShowBtnSave"
-        name="saveBtn"
-        :class="[$style.cmdBtn]"
-        @click="onClickSave"
-        :disabled="!isInputsValid"
-      >
-        <span :class="[$style.addBtnText]">SAVE</span>
-      </button>
-      <button
-        v-if="needShowBtnClose"
-        name="closeBtn"
-        :class="[$style.cmdBtn]"
-        @click="onClickClose"
-      >
-        <span :class="[$style.addBtnText]">CLOSE</span>
-      </button>
-    </div>
-  </div>
+  <v-container>
+    <v-row>
+      <v-col>
+        <v-form ref="form" class="justify-end" v-model="valid" lazy-validation>
+          <v-select
+            v-model="selectPaymentDescription"
+            :items="costsCategories"
+            label="Please select payment description"
+            required
+          ></v-select>
+
+          <v-text-field
+            v-if="selectPaymentDescription === enterNewCategoryText"
+            v-model="inputPaymentDescription"
+            label="Payment description"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="paymentAmount"
+            label="Payment amount"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="paymentDate"
+            label="Payment date"
+            required
+          ></v-text-field>
+        </v-form>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="text-right">
+        <v-btn
+          v-if="needShowBtnAdd"
+          color="teal"
+          dark
+          @click="onClickAdd"
+          :disabled="!isInputsValid"
+          class="ml-4"
+        >
+          ADD <v-icon>mdi-plus</v-icon>
+        </v-btn>
+
+        <v-btn
+          v-if="needShowBtnSave"
+          color="teal"
+          dark
+          @click="onClickSave"
+          :disabled="!isInputsValid"
+          class="ml-4"
+        >
+          SAVE
+        </v-btn>
+
+        <v-btn
+          v-if="needShowBtnClose"
+          color="teal"
+          dark
+          @click="onClickClose"
+          class="ml-4"
+        >
+          CLOSE
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -71,6 +82,7 @@ export default {
     paymentAmount: null,
     paymentDate: "",
     id: null,
+    enterNewCategoryText: "Enter new payment description below",
   }),
   methods: {
     ...mapMutations(["addCostsCategories"]),
@@ -108,20 +120,22 @@ export default {
       return (
         this.actualPaymentDescription &&
         !Number.isNaN(+this.paymentAmount) &&
-        typeof this.paymentAmount === "number" &&
         this.paymentDate
       );
     },
     costsCategories() {
-      return this.$store.getters.getCostsCategories;
+      return [
+        ...this.$store.getters.getCostsCategories,
+        this.enterNewCategoryText,
+      ];
     },
     actualPaymentDescription() {
-      return this.selectPaymentDescription === "000"
+      return this.selectPaymentDescription === this.enterNewCategoryText
         ? this.inputPaymentDescription
         : this.selectPaymentDescription;
     },
     isNewPaymentDescription() {
-      return this.selectPaymentDescription === "000";
+      return this.selectPaymentDescription === this.enterNewCategoryText;
     },
   },
   mounted() {
@@ -134,7 +148,7 @@ export default {
     }
     this.fetchCategories();
     if (this.$route.name === "addPaymentPreset") {
-      this.selectPaymentDescription = "000";
+      this.selectPaymentDescription = this.enterNewCategoryText;
       this.inputPaymentDescription = this.$route.params.category;
       this.paymentAmount = Number(this.$route.query.value);
       if (isNaN(this.paymentAmount)) {

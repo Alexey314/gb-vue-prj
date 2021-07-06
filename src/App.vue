@@ -1,30 +1,30 @@
 <template>
-  <div id="app">
-    <header>
-      <h1>My personal costs</h1>
-    </header>
-    <router-view></router-view>
-    <transition name="fade">
-      <ModalWindow
-        v-if="modalWindow"
-        :modalWindow="modalWindow"
-        :modalWindowSettings="modalWindowSettings"
-      />
-    </transition>
-    <div v-show="modalWindow" id="page-mask">sfvc</div>
+  <v-app>
+    <v-app-bar app flat>
+      <v-btn plain :ripple="false" to="/dashboard">Dashboard</v-btn>
+      <v-btn plain :ripple="false" to="/about">About</v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <router-view />
+      <transition name="fade">
+        <ModalWindow
+          v-if="modalWindow"
+          :modalWindow="modalWindow"
+          :modalWindowSettings="modalWindowSettings"
+        />
+      </transition>
+    </v-main>
     <transition name="fade">
       <ContextMenu
         v-if="contextMenuSettings"
         :menuSettings="contextMenuSettings"
       />
     </transition>
-  </div>
+  </v-app>
 </template>
 
 <script>
-// import ModalWindow from "./components/ModalWindow";
-// import ContextMenu from "./components/ContextMenu";
-
 export default {
   name: "App",
   components: {
@@ -66,42 +66,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-@import "./components/scss/_variables.scss";
-@import "./components/scss/_mixins.scss";
-
-* {
-  box-sizing: border-box;
-}
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: left;
-  color: $text-color-main;
-  margin-top: 60px;
-  @include container-margins($container-width-desktop);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-#page-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 100;
-}
-</style>

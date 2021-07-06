@@ -1,63 +1,30 @@
 <template>
-  <table :class="[$style.table]">
-    <colgroup>
-      <col :class="[$style.colNum]" />
-      <col :class="[$style.colDate]" />
-      <col :class="[$style.colCat]" />
-      <col :class="[$style.colVal]" />
-    </colgroup>
-    <thead>
-      <th scope="col">#</th>
-      <th scope="col">Date</th>
-      <th scope="col">Category</th>
-      <th scope="col">Value</th>
-    </thead>
-    <tbody>
-      <tr v-for="(rec, i) in costsList" :key="i">
-        <td>{{ rec.id }}</td>
-        <td>{{ rec.date }}</td>
-        <td>{{ rec.category }}</td>
-        <td>{{ rec.value }}</td>
-        <td>
-          <span
-            :class="[$style.contextMenuEllipsis]"
-            name="ellipsisBtn"
-            @click="onClickEllipsis"
-            :rec-id="rec.id"
-            :rec-num="i"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink"
-              aria-hidden="true"
-              focusable="false"
-              width="1em"
-              height="1em"
-              style="
-                -ms-transform: rotate(360deg);
-                -webkit-transform: rotate(360deg);
-                transform: rotate(360deg);
-              "
-              preserveAspectRatio="xMidYMid meet"
-              viewBox="0 0 32 32"
+  <div>
+    <v-data-table
+      :headers="headers"
+      :items="costsList"
+      hide-default-footer
+      class="elevation-1"
+    >
+      <template v-slot:item="row">
+        <tr>
+          <td>{{ row.item.id }}</td>
+          <td>{{ row.item.date }}</td>
+          <td>{{ row.item.category }}</td>
+          <td>{{ row.item.value }}</td>
+          <td>
+            <v-btn
+              plain
+              :ripple="false"
+              @click="(e) => onClickEllipsis(e, row.index)"
             >
-              <g
-                fill="none"
-                stroke="#626262"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-              >
-                <circle cx="16" cy="7" r="2" />
-                <circle cx="16" cy="16" r="2" />
-                <circle cx="16" cy="25" r="2" />
-              </g>
-            </svg>
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+              <v-icon dark>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script>
@@ -89,24 +56,58 @@ export default {
   },
   data: function () {
     return {
+      headers: [
+        {
+          text: "#",
+          align: "start",
+          sortable: false,
+          value: "id",
+        },
+        {
+          text: "Date",
+          align: "start",
+          sortable: false,
+          value: "date",
+        },
+        {
+          text: "Category",
+          align: "start",
+          sortable: false,
+          value: "category",
+        },
+        {
+          text: "Value",
+          align: "start",
+          sortable: false,
+          value: "value",
+        },
+        {
+          text: "",
+          align: "center",
+          sortable: false,
+          value: "",
+          width: "32px",
+        },
+      ],
+      page: 1,
+      pageCount: 3,
       activeRecordData: null,
     };
   },
   methods: {
     ...mapActions(["postData"]),
-    onClickEllipsis(event) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      const recordNum = event.currentTarget.getAttribute("rec-num");
-      this.activeRecordData = Object.assign({}, this.costsList[recordNum]);
+    onClickEllipsis(event, itemIndex) {
+      console.log("event:", event, "itemIndex:", itemIndex);
+      this.activeRecordData = Object.assign({}, this.costsList[itemIndex]);
       contextMenu.owner = this;
-      contextMenu.position.top = rect.top + rect.height;
-      contextMenu.position.left = rect.left;
+      contextMenu.position.top = event.pageY;
+      contextMenu.position.left = event.pageX;
       this.$contextMenu.show(contextMenu);
-      this.$contextMenu.EventBus.$on('command', this.onContextMenuCommand);
+      this.$contextMenu.EventBus.$on("command", this.onContextMenuCommand);
     },
     onContextMenuCommand(cmdId) {
       this[cmdId]();
-      this.$contextMenu.EventBus.$off('command', this.onContextMenuCommand);
+      this.$contextMenu.EventBus.$off("command", this.onContextMenuCommand);
     },
     [CMD_EDIT]() {
       this.$modal.show("CostInputForm", {

@@ -1,40 +1,33 @@
 <template>
   <div :class="[$style.root]">
     <costs-list :costs-list="costsListPaginated" />
-    <paginator-widget
-      v-show="costsListPageCount > 1"
-      :page-count="costsListPageCount"
-      :page-num="costsListPageNum"
-      @change-page="onChangePage"
-    />
+    <div class="text-center pt-2">
+      <v-pagination v-model="currentPage" :length="costsListPageCount"></v-pagination>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import CostsList from "./CostsList.vue";
-import PaginatorWidget from "./PaginatorWidget.vue";
 
 export default {
   components: {
     CostsList,
-    PaginatorWidget,
   },
   data: () => ({
+    currentPage: 1,
   }),
   methods: {
-    ...mapMutations(['setCostsPageNum']),
     ...mapActions(["fetchData"]),
     ...mapGetters([
       "getCostsPageData",
       "getCostsListPageCount",
-      'getCostsCurrentPageNum'
     ]),
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
     },
     onChangePage(pageNum) {
-      this.setCostsPageNum(pageNum);
       this.fetchData(pageNum);
     },
   },
@@ -43,18 +36,15 @@ export default {
       return this.getCostsListPageCount();
     },
     costsListPaginated() {
-      return this.getCostsPageData()(this.getCostsCurrentPageNum());
+      return this.getCostsPageData()(this.currentPage);
     },
-    costsListPageNum(){
-      return this.getCostsCurrentPageNum();
-    }
   },
   mounted: function () {
     this.fetchData(1);
   },
   watch: {
-    userAddedCostCount() {
-      this.costsListPageNum = this.costsListPageCount;
+    currentPage(val) {
+      this.onChangePage(val);
     },
   },
 };
