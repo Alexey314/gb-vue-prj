@@ -1,16 +1,16 @@
 <template>
   <div :class="[$style.root]">
-    <select :class="[$style.input]" v-model="paymentDescription">
+    <select :class="[$style.input]" v-model="selectPaymentDescription">
       <option disabled value="">Please select payment description</option>
       <option v-for="cat in costsCategories" :key="cat">{{ cat }}</option>
       <option value="000">enter new payment description below</option>
     </select>
     <input
-      v-if="paymentDescription === '000'"
+      v-if="selectPaymentDescription === '000'"
       :class="[$style.input]"
       type="text"
       placeholder="Payment description"
-      v-model.trim="newPaymentDescription"
+      v-model.trim="inputPaymentDescription"
     />
     <input
       :class="[$style.input]"
@@ -35,25 +35,26 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapMutations, mapActions } from "vuex";
 
 export default {
   data: () => ({
-    paymentDescription: "",
-    newPaymentDescription: "",
+    selectPaymentDescription: "",
+    inputPaymentDescription: "",
     paymentAmount: null,
     paymentDate: "",
   }),
   methods: {
-    ...mapMutations(["addNewCost", "addCostsCategories"]),
+    ...mapMutations(["addCostsCategories"]),
+    ...mapActions(["fetchCategories", "postData"]),
     onClickAdd() {
-      this.addNewCost({
+      this.postData({
         category: this.actualPaymentDescription,
         value: this.paymentAmount,
         date: this.paymentDate,
       });
       if (this.isNewPaymentDescription) {
-        this.addCostsCategories([this.newPaymentDescription]);
+        this.addCostsCategories([this.inputPaymentDescription]);
       }
     },
   },
@@ -70,13 +71,30 @@ export default {
       return this.$store.getters.getCostsCategories;
     },
     actualPaymentDescription() {
-      return this.paymentDescription === "000"
-        ? this.newPaymentDescription
-        : this.paymentDescription;
+      return this.selectPaymentDescription === "000"
+        ? this.inputPaymentDescription
+        : this.selectPaymentDescription;
     },
     isNewPaymentDescription() {
-      return this.paymentDescription === "000";
+      return this.selectPaymentDescription === "000";
     },
+  },
+  mounted() {
+    this.fetchCategories();
+    if (this.$route.name === "addPaymentPreset") {
+      this.selectPaymentDescription = "000";
+      this.inputPaymentDescription = this.$route.params.category;
+      this.paymentAmount = Number(this.$route.query.value);
+      if (isNaN(this.paymentAmount)) {
+        this.paymentAmount = "";
+      }
+      this.paymentDate = new Date(Date.now())
+        .toLocaleString("ru-RU")
+        .split(",")[0];
+      if (this.isInputsValid) {
+        this.onClickAdd();
+      }
+    }
   },
 };
 </script>

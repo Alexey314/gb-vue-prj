@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters, mapMutations } from "vuex";
 import CostsList from "./CostsList.vue";
 import PaginatorWidget from "./PaginatorWidget.vue";
 
@@ -21,28 +21,20 @@ export default {
     PaginatorWidget,
   },
   data: () => ({
-    costsListPageNum: 1,
   }),
   methods: {
-    ...mapActions(["fetchData", "fetchDataStatus"]),
+    ...mapMutations(['setCostsPageNum']),
+    ...mapActions(["fetchData"]),
     ...mapGetters([
       "getCostsPageData",
       "getCostsListPageCount",
-      "getCostsPerPageLimit",
-      "getUserAddedCostCount",
+      'getCostsCurrentPageNum'
     ]),
     toggleInputFormVisible() {
       this.showInputForm = !this.showInputForm;
     },
-    onAddCost(/*newCost*/) {
-      //   const newCostsRec = Object.assign({}, newCost);
-      //   const newCostsIndex = this.costs.length;
-      //   newCostsRec.index = newCostsIndex + 1;
-      //   this.$set(this.costs, newCostsIndex, newCostsRec);
-      //   this.costsListPageNum = this.costsListPageCount;
-    },
     onChangePage(pageNum) {
-      this.costsListPageNum = pageNum;
+      this.setCostsPageNum(pageNum);
       this.fetchData(pageNum);
     },
   },
@@ -51,17 +43,13 @@ export default {
       return this.getCostsListPageCount();
     },
     costsListPaginated() {
-      return this.getCostsPageData()(this.costsListPageNum);
+      return this.getCostsPageData()(this.getCostsCurrentPageNum());
     },
-    costsPerPageLimit() {
-      return this.getCostsPerPageLimit();
-    },
-    userAddedCostCount() {
-      return this.getUserAddedCostCount();
-    },
+    costsListPageNum(){
+      return this.getCostsCurrentPageNum();
+    }
   },
   mounted: function () {
-    this.fetchDataStatus();
     this.fetchData(1);
   },
   watch: {

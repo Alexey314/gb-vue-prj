@@ -3,42 +3,18 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-const getPageKey = (pageNum) => `page${pageNum}`;
-
 const store = new Vuex.Store({
   state: {
-    costs: {},
+    costs: [],
     costsPageCount: 1,
-    costsPerPage: 1,
-    userAddedCostCount: 0,
     costsCategories: new Set(),
+    costsCurrentPageNum: 1,
   },
   mutations: {
-    addNewCost(state, { category, value, date }) {
-      const pageKey = getPageKey(state.costsPageCount);
-      const pageData = state.costs[pageKey];
-      const newRecId = pageData[pageData.length - 1].id + 1;
-      const newRec = {
-        id: newRecId,
-        date: String(date),
-        category: String(category),
-        value: Number(value),
-      };
-
-      if (pageData.length >= state.costsPerPage) {
-        const newPageKey = getPageKey(state.costsPageCount + 1);
-        Vue.set(state.costs, newPageKey, [newRec]);
-        state.costsPageCount += 1;
-      } else {
-        Vue.set(state.costs[pageKey], pageData.length, newRec);
-      }
-
-      state.userAddedCostCount += 1;
-    },
-    setCostsPageData(state, { pageNum, newData }) {
-      const pageKey = getPageKey(pageNum);
+    setCostsPageData(state, newData) {
       // console.log("setCostsPageData", newData);
-      Vue.set(state.costs, pageKey, newData);
+      Vue.set(state.costs, newData.pageNum, newData.pageData);
+      state.costsPageCount = newData.pageCount;
     },
     addCostsCategories(state, newCategories) {
       state.costsCategories = new Set([
@@ -46,10 +22,13 @@ const store = new Vuex.Store({
         ...newCategories,
       ]);
     },
+    setCostsPageNum(state, pageNum) {
+      state.costsCurrentPageNum = pageNum;
+    },
   },
   getters: {
     getCostsPageData: (state) => (pageNum) => {
-      const pageData = state.costs[getPageKey(pageNum)];
+      const pageData = state.costs[pageNum];
       // console.log(
       //   "getCostsPageData",
       //   getPageKey(pageNum),
@@ -58,31 +37,49 @@ const store = new Vuex.Store({
       return pageData === undefined ? [] : pageData;
     },
     getCostsListPageCount: (state) => state.costsPageCount,
-    getCostsPerPageLimit: (state) => state.costsPerPage,
-    getUserAddedCostCount: (state) => state.userAddedCostCount,
     getCostsCategories: (state) => state.costsCategories,
+    getCostsCurrentPageNum: (state) => state.costsCurrentPageNum,
   },
   actions: {
-    fetchDataStatus({ commit, state }) {
-      return fetch("./PaymentsDataStatus.json").then((response) => {
-        response.json().then((val) => {
-          // console.log(val);
-          state.costsPageCount = Math.max(val.pageCount, state.costsPageCount);
-          state.costsPerPage = val.costsPerPage;
-          commit("addCostsCategories", val.categories);
+    postData({ commit }, newData) {
+      return fetch("/PaymentsData", {
+        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *client
+        body: JSON.stringify(newData), // body data type must match "Content-Type" header
+      })
+        .then((response) => {
+          return response.json();
+        })
+        .then((val) => {
+          commit("setCostsPageData", val);
+          commit("setCostsPageNum", val.pageNum);
         });
-      });
     },
-    fetchData({ commit, state }, pageNum) {
-      return fetch("./PaymentsData.json").then((resp) => {
-        resp.json().then((val) => {
-          const pageKey = getPageKey(pageNum);
-          if (state.costs[pageKey] === undefined) {
-            commit("setCostsPageData", { pageNum, newData: val[pageKey] });
-          }
-          // console.log(val, val[pageKey]);
+    fetchData({ commit }, pageNum) {
+      return fetch(`/PaymentsData?page=${pageNum}`)
+        .then((resp) => {
+          return resp.json();
+        })
+        .then((val) => {
+          commit("setCostsPageData", val);
         });
-      });
+    },
+    fetchCategories({ commit }) {
+      return fetch("/Categories")
+        .then((resp) => {
+          return resp.json();
+        })
+        .then((val) => {
+          commit("addCostsCategories", val);
+        });
     },
   },
 });
