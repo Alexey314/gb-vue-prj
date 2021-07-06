@@ -21,6 +21,7 @@
         <td>
           <span
             :class="[$style.contextMenuEllipsis]"
+            name="ellipsisBtn"
             @click="onClickEllipsis"
             :rec-id="rec.id"
             :rec-num="i"
@@ -108,7 +109,6 @@ export default {
       this.$contextMenu.EventBus.$off('command', this.onContextMenuCommand);
     },
     [CMD_EDIT]() {
-      console.log(CMD_EDIT);
       this.$modal.show("CostInputForm", {
         header: "Edit payment details",
         formButtons: ["save", "close"],
@@ -116,7 +116,6 @@ export default {
       });
     },
     [CMD_DELETE]() {
-      console.log(CMD_DELETE);
       this.postData({
         id: this.activeRecordData.id,
         action: "remove",
